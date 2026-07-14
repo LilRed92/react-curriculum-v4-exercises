@@ -26,3 +26,6 @@ dist-ssr
 
 # User
 .history/
+.ai-commit-rules.txt
+.env
+generate-commit.mjs

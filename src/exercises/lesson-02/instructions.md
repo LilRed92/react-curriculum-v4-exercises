@@ -1,4 +1,4 @@
-# Lesson-02 - ReactDOM, Components, JSX, and Troubleshooting
+.# Lesson-02 - ReactDOM, Components, JSX, and Troubleshooting
 
 For this exercise you’ll deepen your React foundation by working with ReactDOM, components, and JSX, while organizing your code into multiple files.
 
