@@ -13,8 +13,7 @@ export default function BugMutatedState() {
   let [count, setCount] = useState(0);
 
   function handleAdd() {
-    count++;
-    setCount(count);
+    setCount((previous) => previous + 1);
   }
 
   return (
@@ -26,4 +25,4 @@ export default function BugMutatedState() {
 }
 
 // Explanation:
-// (Write your explanation here)
+// Before fixing it, calling setCount(count + 1) twice just used the same count value from that render for both calls. Passing an updater function like setCount(previous => previous + 1) makes sure each setter gets the latest state from the previous update when React batches them together.
