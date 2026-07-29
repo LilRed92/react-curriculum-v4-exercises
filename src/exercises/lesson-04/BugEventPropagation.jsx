@@ -6,7 +6,8 @@ export default function BugEventPropagation() {
     alert("RED BOX CLICKED ❌ Don't show me!");
   }
 
-  function handleInnerClick() {
+  function handleInnerClick(e) {
+    e.stopPropagation();
     alert('Button Clicked ✅');
   }
 
@@ -22,3 +23,9 @@ export default function BugEventPropagation() {
     </>
   );
 }
+
+// Explanation:
+// In React, events bubble up from child elements to parent elements by default.
+// When clicking the button, the click event also triggers the parent div's onClick.
+// Calling e.stopPropagation() inside handleInnerClick stops this bubbling process,
+// ensuring only the button's click handler is executed.
