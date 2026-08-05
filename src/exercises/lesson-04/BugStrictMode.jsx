@@ -7,9 +7,10 @@ export default function BugStrictMode() {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    setInterval(() => {
+    const id = setInterval(() => {
       setCount((c) => c + 1);
     }, 1000);
+    return () => clearInterval(id);
   }, []);
 
   return (
@@ -20,4 +21,9 @@ export default function BugStrictMode() {
   );
 }
 
-// Write your explanation of how StrictMode helps us catch this bug
+// Explanation:
+// React StrictMode double-mounts components in development to detect side-effects.
+// Since the original useEffect had no cleanup function, a new interval was created
+// on every mount without clearing the previous one. This led to multiple active
+// intervals running at the same time, causing the count to increment by 2.
+// Adding a cleanup function to clear the interval on unmount solves this issue.

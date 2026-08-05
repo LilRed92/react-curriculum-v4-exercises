@@ -12,7 +12,12 @@ export default function Parent() {
     <div>
       <h2>Parent-Child Communication</h2>
       <p>Counter: {count}</p>
-      <Child />
+      <Child onIncrement={increment} />
     </div>
   );
 }
+
+// Explanation:
+// In React, data flows downward (parent to child) via props.
+// To allow a child to trigger a state update in the parent, I passed a callback
+// function (increment) as a prop to the child component.
