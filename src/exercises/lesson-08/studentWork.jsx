@@ -1,7 +1,7 @@
 //Lesson-08 Advanced Hooks: useCallback and useMemo, Optimizing a React App
 //Exercise: Book Library Dashboard Performance Optimization
 
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { bookData, getAllGenres, filterBooksByGenre } from './bookData.js';
 import {
   useRenderCounter,
@@ -20,23 +20,22 @@ export default function StudentWork() {
   const [sortBy, setSortBy] = useState('title');
   const [favorites, setFavorites] = useState([]);
 
-  const allGenres = getAllGenres();
+  // bookData is a static module import, so the genre list only needs building once.
+  const allGenres = useMemo(() => getAllGenres(), []);
 
-  // TODO #1: Optimize this search handler with useCallback
-  // This function is recreated on every render, causing BookCard re-renders
-  const handleSearch = (e) => {
+  // Stable reference: the setter is never re-created, so no dependencies needed.
+  const handleSearch = useCallback((e) => {
     setSearchTerm(e.target.value);
-  };
+  }, []);
 
-  // TODO #2: Optimize this favorite toggle handler with useCallback
-  // This function is recreated on every render, causing BookCard re-renders
-  const handleToggleFavorite = (bookId) => {
+  // Stable reference: the updater form reads `prev`, so `favorites` is not a dependency.
+  const handleToggleFavorite = useCallback((bookId) => {
     setFavorites((prev) =>
       prev.includes(bookId)
         ? prev.filter((id) => id !== bookId)
         : [...prev, bookId]
     );
-  };
+  }, []);
 
   const handleGenreToggle = (genre) => {
     setSelectedGenres((prev) =>
@@ -44,14 +43,19 @@ export default function StudentWork() {
     );
   };
 
-  // Filter books by search term and selected genres
-  let filteredBooks = bookData.filter(
-    (book) =>
-      book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter books by search term and selected genres.
+  // Memoized so a favorites toggle hands BookStats and BookList the same array
+  // reference, which keeps their own memoized work from being invalidated.
+  const filteredBooks = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    const matchingBooks = bookData.filter(
+      (book) =>
+        book.title.toLowerCase().includes(term) ||
+        book.author.toLowerCase().includes(term)
+    );
 
-  filteredBooks = filterBooksByGenre(filteredBooks, selectedGenres);
+    return filterBooksByGenre(matchingBooks, selectedGenres);
+  }, [searchTerm, selectedGenres]);
 
   return (
     <div className={styles.dashboard}>
@@ -214,7 +218,6 @@ export default function StudentWork() {
       {/* Book List */}
       <BookList
         books={filteredBooks}
-        searchTerm={searchTerm}
         sortBy={sortBy}
         favorites={favorites}
         onToggleFavorite={handleToggleFavorite}

@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import {
   useRenderCounter,
   RenderCounter,
@@ -8,10 +9,8 @@ import styles from './BookStats.module.css';
 function BookStats({ books }) {
   const { count } = useRenderCounter('BookStats');
 
-  // TODO #4: Optimize these expensive calculations with useMemo
-  // These calculations run every time the component renders,
-  // even when the books array hasn't changed
-  const calculateStats = () => {
+  // Recomputed only when `books` changes; every other render reuses the cached result.
+  const stats = useMemo(() => {
     // eslint-disable-next-line react-hooks/purity
     const startTime = performance.now();
 
@@ -87,9 +86,7 @@ function BookStats({ books }) {
       microseconds: microseconds.toFixed(2),
       _dummy: dummy, // Prevent optimization from removing our timing code
     };
-  };
-
-  const stats = calculateStats();
+  }, [books]);
 
   return (
     <div className={styles.statsContainer}>
@@ -132,4 +129,5 @@ function BookStats({ books }) {
   );
 }
 
-export default BookStats;
+// `books` is the only prop, so favorites and sorting changes no longer reach here.
+export default memo(BookStats);
