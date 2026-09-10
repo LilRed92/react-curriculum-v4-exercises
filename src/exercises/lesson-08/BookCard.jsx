@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import {
   useRenderCounter,
   RenderCounter,
@@ -32,4 +33,6 @@ function BookCard({ book, isFavorite, onToggleFavorite }) {
   );
 }
 
-export default BookCard;
+// `onToggleFavorite` is stabilized with useCallback upstream, so a card only
+// re-renders when its own `book` or `isFavorite` value changes.
+export default memo(BookCard);
