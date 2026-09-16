@@ -7,7 +7,11 @@ import styles from '../StudentWork.module.css';
 export function QuestionItem({ question }) {
   //HINT: use these with controlled form
   const [workingText, setWorkingText] = useState(question.question);
-  const { dispatch } = useContext(SurveyContext);
+  const [editingOptionIndex, setEditingOptionIndex] = useState(null);
+  const [optionText, setOptionText] = useState('');
+  const [newOptionText, setNewOptionText] = useState('');
+  const { state, dispatch } = useContext(SurveyContext);
+  const isEditing = state.ui.editingQuestionId === question.id;
 
   // Helper function to convert type to title case
   const formatQuestionType = (type) => {
@@ -19,20 +23,27 @@ export function QuestionItem({ question }) {
 
   // TODO: Students will add edit functionality here
   const handleEdit = () => {
-    console.log('TODO: Implement edit functionality');
-    // Hint: Use SET_EDITING_QUESTION action
+    setWorkingText(question.question);
+    dispatch({
+      type: 'SET_EDITING_QUESTION',
+      payload: { questionId: isEditing ? null : question.id },
+    });
   };
 
   // TODO: Students will add save functionality here
   const handleSave = () => {
-    console.log('TODO: Implement save functionality');
-    // Hint: Use UPDATE_QUESTION_TEXT action with workingText
+    dispatch({
+      type: 'UPDATE_QUESTION_TEXT',
+      payload: { id: question.id, newText: workingText },
+    });
+    dispatch({ type: 'SET_EDITING_QUESTION', payload: { questionId: null } });
   };
 
   // TODO: Students will add delete functionality here
   const handleDelete = () => {
-    console.log('TODO: Implement delete functionality');
-    // Hint: Show confirmation dialog, then use DELETE_QUESTION action
+    if (window.confirm('Are you sure you want to delete this question?')) {
+      dispatch({ type: 'DELETE_QUESTION', payload: { id: question.id } });
+    }
   };
 
   return (
@@ -44,17 +55,41 @@ export function QuestionItem({ question }) {
         <div className={styles['question-actions']}>
           {/* TODO: Students add Edit and Delete buttons here */}
           <button className={styles['edit-btn']} onClick={handleEdit}>
-            Edit (TODO)
+            {isEditing ? 'Cancel' : 'Edit'}
           </button>
           <button className={styles['delete-btn']} onClick={handleDelete}>
-            Delete (TODO)
+            Delete
           </button>
         </div>
       </div>
 
       {/* TODO: Students will add conditional controlled form to edit question here */}
       <div className={styles['question-content']}>
-        <h3>{question.question}</h3>
+        {isEditing ? (
+          <div className={styles['edit-form']}>
+            <input
+              type="text"
+              value={workingText}
+              onChange={(e) => setWorkingText(e.target.value)}
+            />
+            <button onClick={handleSave} className={styles['save-btn']}>
+              Save
+            </button>
+            <button
+              onClick={() =>
+                dispatch({
+                  type: 'SET_EDITING_QUESTION',
+                  payload: { questionId: null },
+                })
+              }
+              className={styles['cancel-btn']}
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <h3>{question.question}</h3>
+        )}
       </div>
 
       {question.type === QUESTION_TYPES.MULTIPLE_CHOICE && (
@@ -63,10 +98,87 @@ export function QuestionItem({ question }) {
           <ul>
             {question.options.map((option, index) => (
               <li key={index} className={styles['option-item']}>
-                <span className={styles['option-text']}>{option}</span>
+                {editingOptionIndex === index ? (
+                  <>
+                    <input
+                      type="text"
+                      value={optionText}
+                      onChange={(e) => setOptionText(e.target.value)}
+                    />
+                    <button
+                      onClick={() => {
+                        dispatch({
+                          type: 'UPDATE_OPTION_TEXT',
+                          payload: {
+                            questionId: question.id,
+                            optionIndex: index,
+                            newText: optionText,
+                          },
+                        });
+                        setEditingOptionIndex(null);
+                      }}
+                    >
+                      Save
+                    </button>
+                    <button onClick={() => setEditingOptionIndex(null)}>
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span className={styles['option-text']}>{option}</span>
+                    <button
+                      onClick={() => {
+                        setOptionText(option);
+                        setEditingOptionIndex(index);
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      disabled={question.options.length <= 2}
+                      onClick={() =>
+                        dispatch({
+                          type: 'DELETE_OPTION_FROM_QUESTION',
+                          payload: {
+                            questionId: question.id,
+                            optionIndex: index,
+                          },
+                        })
+                      }
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
               </li>
             ))}
           </ul>
+
+          <div className={styles['add-option-row']}>
+            <input
+              type="text"
+              value={newOptionText}
+              placeholder="Add new option..."
+              onChange={(e) => setNewOptionText(e.target.value)}
+            />
+            <button
+              onClick={() => {
+                if (newOptionText.trim()) {
+                  dispatch({
+                    type: 'ADD_OPTION_TO_QUESTION',
+                    payload: {
+                      questionId: question.id,
+                      optionText: newOptionText.trim(),
+                    },
+                  });
+                  setNewOptionText('');
+                }
+              }}
+            >
+              + Add Option
+            </button>
+          </div>
         </div>
       )}
     </div>
