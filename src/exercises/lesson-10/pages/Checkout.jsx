@@ -1,11 +1,16 @@
 import { useNavigate } from 'react-router-dom';
+import { BASE_PATH } from '../studentWork.jsx';
 
 export default function Checkout() {
-  const navigate = null;
+  const navigate = useNavigate();
 
-  function handleGoHome() {}
+  function handleGoHome() {
+    navigate(BASE_PATH);
+  }
 
-  function handleBack() {}
+  function handleBack() {
+    navigate(-1);
+  }
 
   return (
     <section>

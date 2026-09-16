@@ -1,9 +1,19 @@
-import React, { useState } from 'react';
-
+import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
+import { products as productsData } from './data/products';
+// Pages imports
+import Home from './pages/Home';
+import Checkout from './pages/Checkout';
+import ProductDetails from './pages/ProductDetails';
+import Account from './pages/Account';
+import NotFound from './pages/NotFound';
+
+export const BASE_PATH = '/lessons/lesson-10';
 
 export default function StudentWork() {
+  const [products] = useState(productsData);
   const [user, setUser] = useState({
     isLoggedIn: true,
     firstName: 'Avery',
@@ -39,7 +49,20 @@ export default function StudentWork() {
 
       <Header user={user} />
 
-      <main style={{ padding: 12 }}></main>
+      <main style={{ padding: 12 }}>
+        <Routes>
+          <Route path="/" element={<Home products={products} />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route
+            path="/products/:id"
+            element={<ProductDetails products={products} />}
+          />
+          {user.isLoggedIn && (
+            <Route path="/account" element={<Account user={user} />} />
+          )}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
 
       <Footer />
     </div>
