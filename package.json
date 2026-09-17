@@ -16,6 +16,7 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-error-boundary": "^6.0.0",
+    "react-router": "^8.4.0",
     "react-router-dom": "^7.11.0"
   },
   "devDependencies": {
@@ -38,7 +39,7 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "vite": "^7.3.0",
-    "vitest": "^3.2.4"
+    "vitest": "^5.0.1"
   },
   "lint-staged": {
     "*.{js,jsx,css,md}": "prettier --cache --write --experimental-cli"
